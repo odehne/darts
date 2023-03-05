@@ -1,0 +1,2 @@
+C:\git\priv\Darts\dartsStatsUi\obj\Debug\dartsstatsui.esproj.SuggestedBindingRedirects.cache
+C:\git\priv\Darts\dartsStatsUi\obj\Debug\dartsstatsui.esproj.CoreCompileInputs.cache
