@@ -106,7 +106,7 @@ namespace ScoresDb.Repositories
 			return Items;
 		}
 
-		public async Task<List<AllThrowsEntity>> GetThrows(Guid legId)
+		public async Task<AllThrowsEntity> GetThrows(Guid legId)
 		{
 			return await _throwRepo.GetThrowsByLegId(legId);
 		}

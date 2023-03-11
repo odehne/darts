@@ -2,7 +2,7 @@
 {
 	public class LegEntity : DartEntity
     {
-		public List<AllThrowsEntity> ThrowsOfPlayers { get; set; }
+		public AllThrowsEntity ThrowsOfPlayers { get; set; }
 		public int LegIndex { get; set; }
 		public int StartValue { get; set; }
 		public Guid LegWinner {get; set;}
@@ -11,13 +11,13 @@
 
 		public LegEntity()
 		{
-			ThrowsOfPlayers = new List<AllThrowsEntity>();
+			ThrowsOfPlayers = new AllThrowsEntity();
 		}
 
-		public AllThrowsEntity GetThrows(Guid playerId)
+		public List<ThrowEntity> GetThrows(Guid playerId)
 		{
-			return ThrowsOfPlayers.FirstOrDefault(x=>x.PlayerId == playerId);
-		}
+            return ThrowsOfPlayers.Where(x => x.PlayerId == playerId).ToList();
+        }
 	}
 
 }

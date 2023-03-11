@@ -40,7 +40,7 @@ class WonVsLostChart extends Component {
     }
 
     async populateWinsAndLossesData() {
-        const response = await fetch('https://localhost:7141/players/519b1df2-1b1a-4cf7-b7ce-5252bd57189d/legs/winsandlosses');
+        const response = await fetch('https://localhost:7141/players/fb3fc2b2-a01b-4dd6-99e9-838262a8a614/legs/winsandlosses');
         const data = await response.json();
         this.setState({ wonsVsLosses: data, loading: false });
     }

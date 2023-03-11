@@ -1,7 +1,25 @@
 ﻿namespace ScoresDb.Models
 {
 
-	public class PlayerCheckoutHistoryModel
+	public class SideBarData
+	{
+		public List<PlayerModel> Players { get; set; }
+
+        public SideBarData()
+        {
+			Players = new List<PlayerModel>();
+        }
+    }
+
+	public class PlayerModel
+    {
+		public string Id { get; set; }
+		public string Name { get; set; }
+		public string Title { get; set; }
+		public string Path { get; set; }
+	}
+
+    public class PlayerCheckoutHistoryModel
 	{
 
 		public string PlayerName { get; set; }

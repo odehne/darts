@@ -1,4 +1,6 @@
-﻿namespace ScoresDb.Repositories
+﻿using ScoresDb.Models;
+
+namespace ScoresDb.Repositories
 {
     public interface IRepository<T>
     {
@@ -14,6 +16,7 @@
         public Task<T> Update(T item);
         public Task<bool> Delete(T item);
 
+      
 
     }
 }

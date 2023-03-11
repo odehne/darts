@@ -1284,11 +1284,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Git\\priv\\Darts\\Darts\\Darts.csproj",
+      "projectUniqueName": "C:\\Git\\priv\\darts\\Darts\\Darts.csproj",
       "projectName": "Darts",
-      "projectPath": "C:\\Git\\priv\\Darts\\Darts\\Darts.csproj",
+      "projectPath": "C:\\Git\\priv\\darts\\Darts\\Darts.csproj",
       "packagesPath": "C:\\Users\\olive\\.nuget\\packages\\",
-      "outputPath": "C:\\Git\\priv\\Darts\\Darts\\obj\\",
+      "outputPath": "C:\\Git\\priv\\darts\\Darts\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1310,8 +1310,8 @@
         "net7.0-windows7.0": {
           "targetAlias": "net7.0-windows",
           "projectReferences": {
-            "C:\\Git\\priv\\Darts\\ScoresDb\\ScoresDb.csproj": {
-              "projectPath": "C:\\Git\\priv\\Darts\\ScoresDb\\ScoresDb.csproj"
+            "C:\\Git\\priv\\darts\\ScoresDb\\ScoresDb.csproj": {
+              "projectPath": "C:\\Git\\priv\\darts\\ScoresDb\\ScoresDb.csproj"
             }
           }
         }

@@ -36,7 +36,7 @@ class LegAvgChart extends Component {
     }
 
     async populateLegAvgData() {
-        const response = await fetch('https://localhost:7141/players/519b1df2-1b1a-4cf7-b7ce-5252bd57189d/legs/avg');
+        const response = await fetch('https://localhost:7141/players/fb3fc2b2-a01b-4dd6-99e9-838262a8a614/legs/avg');
         const data = await response.json();
         this.setState({ checkouts: data, loading: false });
     }

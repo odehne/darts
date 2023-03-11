@@ -68,10 +68,7 @@ namespace ScoresDb.Repositories
 				{
 					foreach (var top in leg.ThrowsOfPlayers)
 					{
-						foreach (var thr in top)
-						{
-							_ = await AllThrows.Create(thr);  
-						}
+						_ = await AllThrows.Create(top);  
 					}
 					_ = await AllLegs.Create(leg);
 					foreach (var p in theGame.Players)

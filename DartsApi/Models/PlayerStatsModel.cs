@@ -26,15 +26,16 @@ namespace DartsApi.Models
 			GameStats = new List<GameStatsModel>();
 		}
 
-		public PlayerStatsModel(List<MatchEntity> theGames, PlayerEntity thePlayer)
+		public PlayerStatsModel(List<LegEntity> allLegs, List<MatchEntity> allMatches, PlayerEntity thePlayer)
 		{
 			
 			Id = thePlayer.Id.ToString();
 			Name = thePlayer.Name;
 			LegStats = new List<LegStatsModel>();
-
 			GameStats = new List<GameStatsModel>();
-			foreach (var game in theGames)
+
+
+			foreach (var game in allMatches)
 			{
 				var gs = new GameStatsModel
 				{
@@ -44,14 +45,14 @@ namespace DartsApi.Models
 					PlayedAt = game.PlayedAt
 				};
 
-
 				foreach (var set in game.Sets)
 				{
 					foreach (var leg in set.Legs)
 					{
 						var legStats = new LegStatsModel { Id = leg.Id.ToString() };
 
-						var thrs = leg.ThrowsOfPlayers.Where(x => x.PlayerId == thePlayer.Id).ToList();
+						var thrs = leg.GetThrows(thePlayer.Id);
+
 						legStats.Avg = thrs.Sum(x=>x.Throw) / thrs.Count;
 						legStats.AvgScoreBeforeCheckout = thrs.Where(x => x.Balance > 100).Sum(x => x.Throw) / thrs.Count(x => x.Balance > 100);
 						if(thrs.Last().Throw>HighestCheckout)

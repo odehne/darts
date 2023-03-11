@@ -9,7 +9,7 @@ namespace ScoresDb.Repositories
 	public interface IThrowsRepository : IRepository<ThrowEntity>
 	{
 		Task<AllThrowsEntity> GetThrowsByLegIdAndPlayerId(Guid legId, Guid playerId);
-		Task<List<AllThrowsEntity>> GetThrowsByLegId(Guid legId);
+		Task<AllThrowsEntity> GetThrowsByLegId(Guid legId);
 	}
 
 
@@ -141,9 +141,9 @@ namespace ScoresDb.Repositories
 			throw new NotImplementedException();
 		}
 
-		public async Task<List<AllThrowsEntity>> GetThrowsByLegId(Guid legId)
+		public async Task<AllThrowsEntity> GetThrowsByLegId(Guid legId)
 		{
-			var ret = new List<AllThrowsEntity>();
+			var ret = new AllThrowsEntity();
 			if (Items == null || Items.Count == 0)
 			{
 				await ReadAll();
@@ -151,14 +151,15 @@ namespace ScoresDb.Repositories
 			if (Items.Count > 0)
 			{
 				var allThrows = Items.Where(x => x.LegId == legId);
-				var lst = new AllThrowsEntity();
-				foreach (var playerId in allThrows.Select(p=>p.PlayerId).Distinct())
+                var lst = new AllThrowsEntity();
+				foreach (var playerId in allThrows.Select(p => p.PlayerId).Distinct())
 				{
 					lst.PlayerId = playerId;
-					lst.AddRange(allThrows.Where(p=>p.PlayerId == playerId));
+					lst.AddRange(allThrows.Where(p => p.PlayerId == playerId));
 				}
-				ret.Add(lst);
-			}
+				return lst;
+				//ret.Add(allThrows);
+            }
 			return ret;
 		}
 

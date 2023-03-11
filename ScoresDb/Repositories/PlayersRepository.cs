@@ -6,10 +6,11 @@ namespace ScoresDb.Repositories
 {
     public interface IPlayersRepository : IRepository<PlayerEntity>
     {
+        public Task<SideBarData> GetSideBarData();
 
     }
 
-	public class PlayersRepository : IPlayersRepository
+    public class PlayersRepository : IPlayersRepository
 	{
 		public string TableName => "Players";
 
@@ -168,5 +169,20 @@ namespace ScoresDb.Repositories
 		{
 			return await Create(item);
 		}
-	}
+
+        public async Task<SideBarData> GetSideBarData()
+        {
+            var lst = await GetItems();
+			var ret = new SideBarData();
+
+            ret.Players.Add(new PlayerModel { Id = "home", Name = "Home", Path = "/" });
+
+            foreach (var item in lst)
+			{
+				ret.Players.Add(new PlayerModel { Id = item.Id.ToString(), Name = item.Name, Path = "/Player" });
+			}
+
+			return ret;
+        }
+    }
 }

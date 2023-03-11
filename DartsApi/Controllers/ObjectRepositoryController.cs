@@ -14,17 +14,20 @@ namespace DartsApi.Controllers
 		private readonly ILogger<ObjectRepositoryController> _logger;
 		private readonly IMatchRepository _gameRepo;
 		private readonly IPlayersRepository _playerRepo;
-		private readonly IThrowsRepository _throwRepo;
+        private readonly ILegsRepository _legsRepo;
+        private readonly IThrowsRepository _throwRepo;
 
 		public ObjectRepositoryController(ILogger<ObjectRepositoryController> logger, 
 			IMatchRepository gameRepo,
 			IThrowsRepository throwRepo,
-			IPlayersRepository playerRepo)
+			IPlayersRepository playerRepo,
+            ILegsRepository legsRepo)
 		{
 			_logger = logger;
 			_playerRepo = playerRepo;
 			_gameRepo = gameRepo;
 			_throwRepo = throwRepo;
+			_legsRepo = legsRepo;
 		}
 
 		[HttpGet]
@@ -47,10 +50,11 @@ namespace DartsApi.Controllers
 
 		[HttpGet]
 		[Route("/players")]
-		[ProducesResponseType(typeof(IEnumerable<PlayerEntity>), StatusCodes.Status200OK)]
-		public async Task<ActionResult<IEnumerable<PlayerEntity>>> GetPlayers()
+		[ProducesResponseType(typeof(SideBarData), StatusCodes.Status200OK)]
+		public async Task<ActionResult<SideBarData>> GetPlayers()
 		{
-			var lst = await _playerRepo.GetItems();
+			var lst = await _playerRepo.GetSideBarData();
+
 			return Ok(lst);
 		}
 
@@ -126,9 +130,10 @@ namespace DartsApi.Controllers
 		public async Task<ActionResult<PlayerStatsModel>> GetPlayerStats(string playerId)
 		{
 			var player = await _playerRepo.GetById(Guid.Parse(playerId));
-			var lst = await _gameRepo.GetMatchesByPlayerId(Guid.Parse(playerId));
+            var allMatches = await _gameRepo.GetMatchesByPlayerId(Guid.Parse(playerId));
+            var allLegs = await _legsRepo.GetLegsByPlayerId(Guid.Parse(playerId));
 
-			var stats = new PlayerStatsModel(lst, player);
+            var stats = new PlayerStatsModel(allLegs, allMatches, player);
 			return Ok(stats);
 		}
 	}
