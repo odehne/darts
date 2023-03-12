@@ -277,11 +277,11 @@ namespace ScoresDb.Repositories
 					darts = allThrowsByPlayer.Count * 3;
 					totalDarts.Add(darts);
 				}
-				ret.Datasets.Add(new DataSetModel { id = 1, label = string.Join(',', lbls), data = totalDarts.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
+				ret.Datasets.Add(new DataSetModel { id = 1, label = "", data = totalDarts.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
 			}
 
-			ret.labels = new[] { "Durchschnittliche Darts pro Leg" };
-			return ret;
+			ret.labels = lbls.ToArray();
+            return ret;
 		}
 
 		public async Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id)
@@ -309,7 +309,7 @@ namespace ScoresDb.Repositories
 					legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
 					avgs.Add(legAvg);
 				}
-				ret.Datasets.Add(new DataSetModel { id = 1, label = string.Join(',', lbls), data = avgs.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
+				ret.Datasets.Add(new DataSetModel { id = 1, label = "", data = avgs.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
 			}
 
 			ret.labels = lbls.ToArray();
@@ -328,7 +328,7 @@ namespace ScoresDb.Repositories
 				ret.PlayerId = player.Id.ToString();
 				ret.PlayerName = player.Name;
 
-				var legs = await AllLegs.GetLegsByPlayerId(player.Id);
+				var legs = await AllLegs.GetLegsByPlayerId(player.Id).ConfigureAwait(false);
 
 				var wonLegsCount = legs.Where(x => x.LegWinner == player.Id).Count();
 				var lostLegsCount = legs.Where(x => x.LegWinner != player.Id).Count();
@@ -357,8 +357,7 @@ namespace ScoresDb.Repositories
 					var playerThrows = leg.GetThrows(player.Id);
 					{
 						if (leg.LegWinner == player.Id)
-							ret.WonCheckouts.Add(playerThrows.Last().Balance);
-						ret.AllCheckouts.Add(playerThrows.Last().Balance);
+                            ret.WonCheckouts.Add(playerThrows.Last().Throw);
 					}
 				}
 

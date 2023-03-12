@@ -31,8 +31,8 @@ class WonVsLostChart extends Component {
             <div className="wonvslostchart">
                 <Bar
                     data={this.state.wonsVsLosses}
-                    width={700}
-                    height={500}
+                    width={500}
+                    height={300}
                     options={{}}
                 />
             </div>

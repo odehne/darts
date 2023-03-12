@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PointElement, LineElement, LinearScale, CategoryScale, Chart } from "chart.js";
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 Chart.register(CategoryScale);
 Chart.register(LinearScale);
@@ -25,7 +25,7 @@ class LegAvgChart extends Component {
     render() {
         return (
             <div className="mychart">
-                <Line
+                <Bar
                     data={this.state.checkouts}
                     width={700}
                     height={500}

@@ -27,6 +27,24 @@
     color: white;
 }
 
+@media (min-width: 840px) {
+    .mdc-layout-grid__cell:first-child {
+        grid-column-start: 4;
+    }
+}
+
+.my-card-content {
+    padding: 16px;
+}
+
+.my-card {
+    height: 350px;
+    width: 350px;
+}
+
+h3 {
+    padding: 15px;
+}
 
 /*
 

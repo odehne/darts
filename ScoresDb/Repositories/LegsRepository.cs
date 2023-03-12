@@ -177,7 +177,9 @@ namespace ScoresDb.Repositories
 			}
 			foreach (var id in ids)
 			{
-				ret.Add(await GetById(id));
+				var leg = await GetById(id);
+				if(!ret.Contains(leg))
+					ret.Add(leg);
 			}
 			return ret;
 		}

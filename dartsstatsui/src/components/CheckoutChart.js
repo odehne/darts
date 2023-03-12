@@ -25,10 +25,10 @@ class CheckoutChart extends Component {
     render() {
         return (
             <div className="mychart">
-                <Line
+                <Bar
                     data={this.state.checkouts}
-                    width={700}
-                    height={500}
+                    width={500}
+                    height={300}
                     optionas={{}}
                 />
             </div>

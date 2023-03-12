@@ -75,15 +75,14 @@ namespace DartsApi.Controllers
 			var ret = await _gameRepo.GetCheckoutHistory(Guid.Parse(playerId));
 			var lbls = new List<string>();
 			
-			for (int i = 1; i < ret.AllCheckouts.Count; i++)
+			for (int i = 1; i < ret.WonCheckouts.Count; i++)
 			{
 				lbls.Add(i.ToString());
 			}
 
 			ret.labels = lbls.ToArray();
-			ret.Datasets.Add(new DataSetModel { data = ret.WonCheckouts.ToArray(), id = 1, label = "Gewonnene Legs", borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
-			ret.Datasets.Add(new DataSetModel { data = ret.AllCheckouts.ToArray(), id = 2, label = "All Legs", borderColor = "rgb(0, 85, 235)", backgroundColor = "rgba(0, 85, 235, 0.5)" });
-
+			ret.Datasets.Add(new DataSetModel { data = ret.WonCheckouts.ToArray(), id = 1, label = "", borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+		
 			return Ok(ret);
 		}
 

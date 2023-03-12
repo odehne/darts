@@ -121,7 +121,12 @@ namespace ScoresDb.Repositories
 
 		public async Task<bool> ReadAll()
 		{
-			Items = new List<LegPlayerEntity>();
+
+			if (Items == null)
+				Items = new List<LegPlayerEntity>();
+			else
+				Items.Clear();
+
 			if (string.IsNullOrEmpty(ConnectionString))
 				throw new ArgumentException("ConnectionString not set.");
 
@@ -196,7 +201,11 @@ namespace ScoresDb.Repositories
 			{
 				var lst = Items.Where(x => x.PlayerId == playerId);
 				foreach (var mp in lst)
-					ret.Add(mp.LegId);
+				{
+					if(!ret.Contains(mp.Id))
+						ret.Add(mp.LegId);
+				}
+					
 			}
 			return ret;
 		}
