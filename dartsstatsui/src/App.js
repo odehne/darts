@@ -1,8 +1,9 @@
 import './App.css';
+import Player from './pages/Player'
 import Navbar from './components/Navbar'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import Player from './pages/Player';
+
 
 
 function App() {
@@ -11,14 +12,10 @@ function App() {
           <Router>
               <Navbar />
               <Routes>
-                  <Route exact path='/' element={<Home />}></Route>
-                  <Route exact path='/Player' element={<Player playerId="fb3fc2b2-a01b-4dd6-99e9-838262a8a614" />}></Route>
-                  {/*<Route exact path='/Player' element={<Player playerId="mywerweId" />}></Route>*/}
-                  {/*<Route exact path='/Player' element={<Player playerId="fb3fc2b2-a01b-4dd6-99e9-838262a8a614" />}></Route>*/}
-                  {/*<Route exact path='/Player' element={<Player playerId="ed53c011-d9ff-4223-8053-1817713e16d5" />}></Route>*/}
+                  <Route path='/' element={<Home />}></Route>
+                  <Route path='Player/:playerId' element={<Player />}></Route>
               </Routes>
           </Router>
-      
     </div>
   );
 }

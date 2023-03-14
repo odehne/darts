@@ -1,38 +1,28 @@
 import React from 'react';
-import { Box, Stack, Divider, Grid } from '@mui/material'
+import { useEffect, useState } from 'react'
 import '../App.css';
 
 
-function Home() {
+function Home(props) {
+    const [checkoutData, setCheckoutData] = useState([]);
+
+    useEffect(() => {
+        fetch('https://localhost:7141/players/fb3fc2b2-a01b-4dd6-99e9-838262a8a614/checkouts/history')
+            .then(response => response.json())
+            .then(response => setCheckoutData(response))
+                .catch(error => console.log(error))
+    }, []);
+
+    console.log('checkoutData: [' + checkoutData.playerId + ']')
+
     return (
-        //<div className='App-header'>
-        //    <div className="mdc-layout-grid">
-        //        <div className="mdc-layout-grid__inner">
-        //            <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop">home cell 1</div>
-        //            <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop">home cell 2</div>
-        //            <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop">home cell 3</div>
-        //        </div>
-        //    </div>
-        //</div>
-        <Stack sx={{ border: '1px solid', padding: '10px' }} direction='row' spacing={1} divider={<Divider orientation='vertical' flexitem />}>
-
-            <Box
-                sx={{
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    height: '100px',
-                    width: '100px',
-                    padding: '16px',
-                    '&:hover': {
-                        backgroundColor: 'primary.light',
-                    },
-                } }
-            >
-                Paul
-            </Box>
-
-        </Stack>
-
+        <div className='App-header'>
+            <div className="mdc-layout-grid">
+                <div className="mdc-layout-grid__inner">
+                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop">Hello {checkoutData.playerName}</div>
+                </div>
+            </div>
+        </div>
     )
 }
 

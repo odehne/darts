@@ -277,7 +277,7 @@ namespace ScoresDb.Repositories
 					darts = allThrowsByPlayer.Count * 3;
 					totalDarts.Add(darts);
 				}
-				ret.Datasets.Add(new DataSetModel { id = 1, label = "", data = totalDarts.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
+				ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = totalDarts.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
 			}
 
 			ret.labels = lbls.ToArray();
@@ -309,7 +309,7 @@ namespace ScoresDb.Repositories
 					legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
 					avgs.Add(legAvg);
 				}
-				ret.Datasets.Add(new DataSetModel { id = 1, label = "", data = avgs.ToArray(), borderColor = "rgb(255, 99, 132)", backgroundColor = "rgba(255, 99, 132, 0.5)" });
+				ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = avgs.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
 			}
 
 			ret.labels = lbls.ToArray();
@@ -333,10 +333,17 @@ namespace ScoresDb.Repositories
 				var wonLegsCount = legs.Where(x => x.LegWinner == player.Id).Count();
 				var lostLegsCount = legs.Where(x => x.LegWinner != player.Id).Count();
 
-				ret.Datasets.Add(new DataSetModel { id = 1, label = "Gewonnen", data = new int[] { wonLegsCount }, borderColor = "rgb(128, 235, 0)", backgroundColor = "rgba(128, 235, 0, 0.5)" });
-				ret.Datasets.Add(new DataSetModel { id = 2, label = "Verloren", data = new int[] { lostLegsCount }, borderColor = "rgb(0, 85, 235)", backgroundColor = "rgba(0, 85, 235, 0.5)" });
+				ret.Datasets.Add(new PieChartDataSetModel
+				{
+					id = 1,
+					label = "Gewonnen",
+					data = new int[] { wonLegsCount, lostLegsCount },
+					borderColor = new string[] { "rgba(255, 140, 25, 0.75)", "rgba(179,89,0, 0.5)" },
+					backgroundColor = new string[] { "rgba(255, 140, 25, 0.75)", "rgba(179,89,0, 0.5)" }
+				});
+                //ret.Datasets.Add(new DataSetModel { id = 2, label = "Verloren", data = new int[] { lostLegsCount }, borderColor = "rgb(0, 85, 235)", backgroundColor = "rgba(0, 85, 235, 0.5)" });
 
-			}
+            }
 			return ret;
 		}
 

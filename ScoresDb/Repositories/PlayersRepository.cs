@@ -179,7 +179,7 @@ namespace ScoresDb.Repositories
 
             foreach (var item in lst)
 			{
-				ret.Players.Add(new PlayerModel { Id = item.Id.ToString(), Name = item.Name, Path = "/Player" });
+				ret.Players.Add(new PlayerModel { Id = item.Id.ToString(), Name = item.Name, Path = "/Player/" + item.Id.ToString() });
 			}
 
 			return ret;
