@@ -11,7 +11,22 @@
         }
     }
 
-	public class PlayerModel
+	public class PlayerDetailsModel
+	{
+        public string Id { get; set; }
+        public string Name { get; set; }
+		public double AllLegAvg { get; set; }
+		public double BestLegAvg { get; set; }
+		public int HighScore { get; set; }
+        public int BestDartCount301 { get; set; }
+        public int BestDartCount501 { get; set; }
+        public int HighestCheckout { get; set; }
+		public int MatchCount { get; set; }
+		public int LegCount { get; set; }
+    }
+
+
+    public class PlayerModel
     {
 		public string Id { get; set; }
 		public string Name { get; set; }

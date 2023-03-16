@@ -15,9 +15,10 @@ namespace ScoresDb.Repositories
 		Task<List<MatchEntity>> GetWonMatchesByPlayerId(Guid playerId);
 		Task<DirectCompareModel> GetWonsAgainstPlayer(Guid player1Id, Guid player2Id);
 		Task<PlayerCheckoutHistoryModel> GetCheckoutHistory(Guid id);
-		Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id);
-
-		Task<PlayerDartsPerLegModel> GetHowManyDartsPerLeg(Guid id);
+		Task<PlayerDetailsModel> GetPlayerDetails(Guid id);
+        Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id);
+       
+        Task<PlayerDartsPerLegModel> GetHowManyDartsPerLeg(Guid id);
 
 		Task<WonLegsModel> GetAllPlayerLegs();
 
@@ -371,5 +372,72 @@ namespace ScoresDb.Repositories
 			}
 			return ret;
 		}
-	}
+
+        public async Task<PlayerDetailsModel> GetPlayerDetails(Guid id)
+        {
+            var model = new PlayerDetailsModel();
+            var player = await AllPlayers.GetById(id);
+            var avgs = new List<int>();
+            var dartCountPerLegs301 = new List<int>();
+            var dartCountPerLegs501 = new List<int>();
+			var highscores = new List<int>();
+            var checkouts = new List<int>();
+
+            if (player != null)
+            {
+
+                model.Id = player.Id.ToString();
+                model.Name = player.Name;
+
+                var legs = await AllLegs.GetLegsByPlayerId(player.Id);
+
+                foreach (var leg in legs)
+                {
+                    var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                    var legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
+					var dc = allThrowsByPlayer.Count() * 3;
+					
+					if(leg.StartValue == 501)
+                        dartCountPerLegs501.Add(dc);
+                    if (leg.StartValue == 301)
+                        dartCountPerLegs301.Add(dc);
+
+					checkouts.Add(allThrowsByPlayer[allThrowsByPlayer.Count - 1].Throw);
+                    highscores.Add(GetHighestThrow(allThrowsByPlayer));
+                    avgs.Add(legAvg);
+                }
+
+				var matches = await AllMatchPlayers.GetMatchesByPlayer(player.Id);
+
+                model.AllLegAvg = avgs.Sum() / avgs.Count;
+				model.BestLegAvg = avgs.Max();
+				if(dartCountPerLegs501.Count>0)
+					model.BestDartCount501 = dartCountPerLegs501.Min();
+                if (dartCountPerLegs301.Count > 0)
+                    model.BestDartCount301 = dartCountPerLegs301.Min();
+				model.HighScore = highscores.Max();
+				model.HighestCheckout = checkouts.Max();
+				model.LegCount = legs.Count();
+
+				model.MatchCount = matches.Count();
+            }
+
+            return model;
+        }
+
+       
+
+        public int GetHighestThrow(AllThrowsEntity allThrowsByPlayer)
+		{
+			var highest = 0;
+			foreach (var thr in allThrowsByPlayer)
+			{
+				if(thr.Throw > highest)
+					highest = thr.Throw;
+			}
+			return highest;
+		}
+
+    }
+
 }

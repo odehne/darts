@@ -60,13 +60,14 @@ namespace DartsApi.Controllers
 
 		[HttpGet]
 		[Route("/players/{playerId}")]
-		[ProducesResponseType(typeof(PlayerEntity), StatusCodes.Status200OK)]
-		public async Task<ActionResult<PlayerEntity>> GetPlayer(string playerId)
+		[ProducesResponseType(typeof(PlayerDetailsModel), StatusCodes.Status200OK)]
+		public async Task<ActionResult<PlayerDetailsModel>> GetPlayer(string playerId)
 		{
-			var lst = await _playerRepo.GetById(Guid.Parse(playerId));
-			return Ok(lst);
-		}
+			var details = await _gameRepo.GetPlayerDetails(Guid.Parse(playerId));
 
+			return Ok(details);
+		}
+		                     
 		[HttpGet]
 		[Route("/players/{playerId}/checkouts/history")]
 		[ProducesResponseType(typeof(PlayerCheckoutHistoryModel), StatusCodes.Status200OK)]

@@ -1,4 +1,5 @@
-﻿using ScoresDb.Models;
+﻿using ScoresDb.Entities;
+using ScoresDb.Models;
 
 namespace ScoresDb.Repositories
 {
@@ -9,6 +10,7 @@ namespace ScoresDb.Repositories
         public string ConnectionString { get; set; }
         Task<string> CreateTable();
         public Task<IEnumerable<T>> GetItems();
+
         public Task<T> GetById(Guid id);
         public Task<T> GetByName(string name);
         public Task<bool> ReadAll();

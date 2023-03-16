@@ -9,8 +9,9 @@ namespace ScoresDb.Repositories
 
 		Task<List<PlayerEntity>> GetPlayersByMatch(Guid matchId);
 		Task<bool> AddMatch(Guid matchId, List<PlayerEntity> players);
+        Task<List<MatchPlayerEntity>> GetMatchesByPlayer(Guid playerId);
 
-		Task<Guid> GetIdByMatchAndPlayer(Guid matchId, Guid playerId);
+        Task<Guid> GetIdByMatchAndPlayer(Guid matchId, Guid playerId);
 	}
 
 	public class MatchPlayersReporsitory : IMatchPlayersRepository
@@ -105,7 +106,21 @@ namespace ScoresDb.Repositories
 			return Items;
 		}
 
-		public async Task<List<PlayerEntity>> GetPlayersByMatch(Guid matchId)
+        public async Task<List<MatchPlayerEntity>> GetMatchesByPlayer(Guid playerId)
+        {
+            var ret = new List<MatchPlayerEntity>();
+            if (Items == null || Items.Count == 0)
+            {
+                await ReadAll();
+            }
+            if (Items.Count > 0)
+            {
+                ret = Items.Where(x => x.PlayerId == playerId).ToList();
+            }
+            return ret;
+        }
+
+        public async Task<List<PlayerEntity>> GetPlayersByMatch(Guid matchId)
 		{
 			var ret = new List<PlayerEntity>();
 			if (Items == null || Items.Count == 0)
