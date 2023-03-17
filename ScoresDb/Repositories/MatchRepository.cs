@@ -380,6 +380,7 @@ namespace ScoresDb.Repositories
             var avgs = new List<int>();
             var dartCountPerLegs301 = new List<int>();
             var dartCountPerLegs501 = new List<int>();
+            var dartCountPerLegs170 = new List<int>();
 			var highscores = new List<int>();
             var checkouts = new List<int>();
 
@@ -396,8 +397,10 @@ namespace ScoresDb.Repositories
                     var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
                     var legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
 					var dc = allThrowsByPlayer.Count() * 3;
-					
-					if(leg.StartValue == 501)
+
+                    if (leg.StartValue == 170)
+                        dartCountPerLegs170.Add(dc);
+                    if (leg.StartValue == 501)
                         dartCountPerLegs501.Add(dc);
                     if (leg.StartValue == 301)
                         dartCountPerLegs301.Add(dc);
@@ -413,6 +416,8 @@ namespace ScoresDb.Repositories
 				model.BestLegAvg = avgs.Max();
 				if(dartCountPerLegs501.Count>0)
 					model.BestDartCount501 = dartCountPerLegs501.Min();
+                if (dartCountPerLegs170.Count > 0)
+                    model.BestDartCount170 = dartCountPerLegs170.Min();
                 if (dartCountPerLegs301.Count > 0)
                     model.BestDartCount301 = dartCountPerLegs301.Min();
 				model.HighScore = highscores.Max();

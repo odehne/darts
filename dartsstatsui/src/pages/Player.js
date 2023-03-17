@@ -6,6 +6,7 @@ import WonVsLostChart from '../components/WonVsLostChart'
 import LegAvgChart from '../components/LegAvgChart'
 import TotalDartsChart from '../components/TotalDartsChart'
 import '../App.css';
+import PlayerStats from '../components/PlayerStats';
 
 
 function Player() {
@@ -14,6 +15,7 @@ function Player() {
     return (
         <div className='App-header'>
             <Stack sx={{ padding: '10px' }} direction='column' spacing={1} divider={<Divider orientation='vertical' />}>
+                <PlayerStats playerId={playerId} />
                 <CheckoutChart playerId={playerId} />
                 <LegAvgChart playerId={playerId} />
                 <TotalDartsChart playerId={playerId} />
