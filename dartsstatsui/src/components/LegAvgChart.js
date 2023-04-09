@@ -34,7 +34,7 @@ function LegAvgChart(props) {
     return (
         <div className='mychart'>
             <h3>
-                Durchschnittlicher Wurf pro Leg
+                &#248; Punkte pro Leg
             </h3>
             <Bar
                 data={checkoutData}

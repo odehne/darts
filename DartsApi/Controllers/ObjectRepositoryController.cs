@@ -105,7 +105,25 @@ namespace DartsApi.Controllers
 			return Ok(ret);
 		}
 
-		[HttpGet]
+        [HttpGet]
+        [Route("/players/{playerId}/legs/{startvalue}/bestleg")] //https://localhost:7141/players/fb3fc2b2-a01b-4dd6-99e9-838262a8a614/legs/170bestleg
+        [ProducesResponseType(typeof(PlayerBestLegModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PlayerBestLegModel>> GetPlayersBestLeg(string playerId, int startvalue)
+        {
+            var ret = await _gameRepo.GetBestLeg(Guid.Parse(playerId), startvalue);
+            return Ok(ret);
+        }
+
+        [HttpGet]
+        [Route("/players/{playerId}/legs/{startvalue}/lastweekstrend")]
+        [ProducesResponseType(typeof(PlayerDartsPerLegModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PlayerDartsPerLegModel>> GetOneWeekTrend(string playerId, int startvalue)
+        {
+            var ret = await _gameRepo.GetOneWeekTrend(Guid.Parse(playerId), startvalue);
+            return Ok(ret);
+        }
+
+        [HttpGet]
 		[Route("/players/{playerId}/legs/darts")]
 		[ProducesResponseType(typeof(PlayerDartsPerLegModel), StatusCodes.Status200OK)]
 		public async Task<ActionResult<PlayerDartsPerLegModel>> GetHowManyDartsPerLeg(string playerId)
@@ -114,7 +132,9 @@ namespace DartsApi.Controllers
 			return Ok(ret);
 		}
 
-		[HttpGet]
+     
+
+        [HttpGet]
 		[Route("/players/legs")]
 		[ProducesResponseType(typeof(WonLegsModel), StatusCodes.Status200OK)]
 		public async Task<ActionResult<WonLegsModel>> GetAllPlayerLegs()

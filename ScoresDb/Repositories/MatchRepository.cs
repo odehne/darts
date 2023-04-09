@@ -1,6 +1,7 @@
 ﻿using ScoresDb.Entities;
 using ScoresDb.Models;
 using System.Data;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Numerics;
@@ -9,23 +10,8 @@ using System.Xml.Schema;
 
 namespace ScoresDb.Repositories
 {
-    public interface IMatchRepository : IRepository<MatchEntity>
-    {
-		Task<List<MatchEntity>> GetMatchesByPlayerId(Guid playerId);
-		Task<List<MatchEntity>> GetWonMatchesByPlayerId(Guid playerId);
-		Task<DirectCompareModel> GetWonsAgainstPlayer(Guid player1Id, Guid player2Id);
-		Task<PlayerCheckoutHistoryModel> GetCheckoutHistory(Guid id);
-		Task<PlayerDetailsModel> GetPlayerDetails(Guid id);
-        Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id);
-       
-        Task<PlayerDartsPerLegModel> GetHowManyDartsPerLeg(Guid id);
 
-		Task<WonLegsModel> GetAllPlayerLegs();
-
-		Task<PlayedLegsModel> GetWonOrLostLegs(Guid id);
-	}
-
-	public class MatchRepository : IMatchRepository
+    public class MatchRepository : IMatchRepository
 	{
 		public string TableName => "Games";
 	
@@ -39,6 +25,7 @@ namespace ScoresDb.Repositories
 		public LegPlayersRepository AllLegsAndPlayers { get; set; }
 		public MatchPlayersReporsitory  AllMatchPlayers { get; set; }
 
+	
 		public MatchRepository(string connectionString)
 		{
 			//"Data Source=" + DbPath
@@ -285,13 +272,149 @@ namespace ScoresDb.Repositories
             return ret;
 		}
 
-		public async Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id)
+        public async Task<PlayerBestLegModel> GetBestLeg(Guid id, int startValue)
+        {
+            var ret = new PlayerBestLegModel();
+            var player = await AllPlayers.GetById(id);
+			var lowestThrowCount170 = 0;
+            var lowestThrowCount301 = 0;
+            var lowestThrowCount501 = 0;
+
+			var lowestThrowsByPlayer170 = new AllThrowsEntity();
+            var lowestThrowsByPlayer301 = new AllThrowsEntity();
+            var lowestThrowsByPlayer501 = new AllThrowsEntity();
+
+			if (player != null)
+			{
+
+				ret.PlayerId = player.Id.ToString();
+				ret.PlayerName = player.Name;
+
+				var legs = await AllLegs.GetLegsByPlayerId(player.Id);
+
+				foreach (var leg in legs)
+				{
+					if(leg.StartValue == startValue)
+					{
+                        switch (leg.StartValue)
+                        {
+                            case 170:
+                                var allThrowsByPlayer170 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                                var dc170 = allThrowsByPlayer170.Count() * 3;
+                                if (lowestThrowCount170 > dc170 | lowestThrowCount170 == 0)
+                                {
+                                    lowestThrowCount170 = dc170;
+                                    lowestThrowsByPlayer170 = allThrowsByPlayer170;
+                                }
+
+                                break;
+                            case 301:
+                                var allThrowsByPlayer301 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                                var dc301 = allThrowsByPlayer301.Count() * 3;
+                                if (lowestThrowCount301 > dc301 | lowestThrowCount301 == 0)
+                                {
+                                    lowestThrowCount301 = dc301;
+                                    lowestThrowsByPlayer301 = allThrowsByPlayer301;
+                                }
+                                break;
+                            case 501:
+                                var allThrowsByPlayer501 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                                var dc501 = allThrowsByPlayer501.Count() * 3;
+                                if (lowestThrowCount501 > dc501 | lowestThrowCount301 == 0)
+                                {
+                                    lowestThrowCount501 = dc501;
+                                    lowestThrowsByPlayer501 = allThrowsByPlayer501;
+                                }
+                                break;
+                        }
+                    }
+				}
+			}
+
+            switch (startValue)
+            {
+                case 170:
+                    ret.labels = lowestThrowsByPlayer170.GetLabels();
+                    ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = lowestThrowsByPlayer170.GetThrows(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+                    break;
+                case 301:
+                    ret.labels = lowestThrowsByPlayer301.GetLabels();
+                    ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = lowestThrowsByPlayer301.GetThrows(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+                    break;
+                case 501:
+                    ret.labels = lowestThrowsByPlayer501.GetLabels();
+                    ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = lowestThrowsByPlayer501.GetThrows(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+                    break;
+            }
+
+           return ret;
+        }
+
+        public async Task<PlayerDartsPerLegModel> GetDartsAVGPerLeg(Guid id)
+        {
+            var ret = new PlayerDartsPerLegModel();
+            var player = await AllPlayers.GetById(id);
+            var lbls = new List<string>();
+            var avgs = new List<int>();
+            var legAvg = 0;
+            var index = 0;
+
+            if (player != null)
+            {
+
+                ret.PlayerId = player.Id.ToString();
+                ret.PlayerName = player.Name;
+
+                var legs = await AllLegs.GetLegsByPlayerId(player.Id);
+
+                foreach (var leg in legs)
+                {
+                    index++;
+                    lbls.Add(index.ToString());
+                    var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                    legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
+                    avgs.Add(legAvg);
+                }
+                ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = avgs.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+            }
+
+            ret.labels = lbls.ToArray();
+            return ret;
+        }
+
+        public async Task<List<LegEntity>> GetAllMatchesByDateAndPlayerId(Guid playerId, DateTime startDate, int startValue)
+		{
+			var ret = new List<LegEntity>();
+            var legs = await AllLegs.GetAllWonLegs(playerId);
+
+            Items = new List<MatchEntity>();
+            await ReadAll();
+
+			var lastWeeksMatches = Items.Where(m => m.PlayedAt >= startDate);
+			foreach (var match in lastWeeksMatches)
+			{
+				foreach(var set in match.Sets)
+				{
+					foreach(var leg in set.Legs)
+					{
+						if(leg.LegWinner.Equals(playerId) && leg.StartValue == startValue)
+							ret.Add(leg);
+					}
+				}
+			}
+			return ret;
+
+        }
+
+        public async Task<PlayerDartsPerLegModel> GetOneWeekTrend(Guid playerId, int startValue)
 		{
 			var ret = new PlayerDartsPerLegModel();
-			var player = await AllPlayers.GetById(id);
+            var player = await AllPlayers.GetById(playerId);
+            var lastWeeksWonLegs = await GetAllMatchesByDateAndPlayerId(playerId, DateTime.Now.AddDays(-7), startValue);
 			var lbls = new List<string>();
 			var avgs = new List<int>();
-			var legAvg = 0;
+            var highscores = new List<int>();
+            var legAvg = 0;
 			var index = 0;
 
 			if (player != null)
@@ -300,20 +423,23 @@ namespace ScoresDb.Repositories
 				ret.PlayerId = player.Id.ToString();
 				ret.PlayerName = player.Name;
 
-				var legs = await AllLegs.GetLegsByPlayerId(player.Id);
-
-				foreach (var leg in legs)
+				foreach (var leg in lastWeeksWonLegs)
 				{
 					index++;
-					lbls.Add(index.ToString());
-					var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
-					legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
-					avgs.Add(legAvg);
+                    lbls.Add(index.ToString());
+                    var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                    legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
+                    highscores.Add(GetHighestThrow(allThrowsByPlayer));
+                    avgs.Add(legAvg);
 				}
-				ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "", data = avgs.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
-			}
+				if(avgs.Count > 0)
+				{
+                    ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "Averages", data = avgs.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+                    ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = "Highscores", data = highscores.ToArray(), borderColor = "rgb(179,25,255)", backgroundColor = "rgba(179,25,255, 0.75)" });
+                }
+            }
 
-			ret.labels = lbls.ToArray();
+            ret.labels = lbls.ToArray();
 			return ret;
 		}
 
@@ -377,12 +503,33 @@ namespace ScoresDb.Repositories
         {
             var model = new PlayerDetailsModel();
             var player = await AllPlayers.GetById(id);
-            var avgs = new List<int>();
+            var avgs170 = new List<int>();
+            var avgs301 = new List<int>();
+            var avgs501 = new List<int>();
             var dartCountPerLegs301 = new List<int>();
             var dartCountPerLegs501 = new List<int>();
             var dartCountPerLegs170 = new List<int>();
-			var highscores = new List<int>();
-            var checkouts = new List<int>();
+            var bestLeg170 = new List<int>();
+            var bestLeg301 = new List<int>();
+            var bestLeg501 = new List<int>();
+        
+            var highscores170 = new List<int>();
+            var highscores301 = new List<int>();
+            var highscores501 = new List<int>();
+            var checkouts170 = new List<int>();
+            var checkouts301 = new List<int>();
+            var checkouts501 = new List<int>();
+
+            var allThrowsByPlayer170 = new AllThrowsEntity();
+            var allThrowsByPlayer301 = new AllThrowsEntity();
+            var allThrowsByPlayer501 = new AllThrowsEntity();
+
+			var legAvg170 = 0;
+			var legAvg301 = 0;
+			var legAvg501 = 0;
+			var dc170 = 0;
+			var dc301 = 0;
+			var dc501 = 0;
 
             if (player != null)
             {
@@ -394,37 +541,76 @@ namespace ScoresDb.Repositories
 
                 foreach (var leg in legs)
                 {
-                    var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
-                    var legAvg = allThrowsByPlayer.Sum(x => x.Throw) / (allThrowsByPlayer.Count - 1);
-					var dc = allThrowsByPlayer.Count() * 3;
-
-                    if (leg.StartValue == 170)
-                        dartCountPerLegs170.Add(dc);
-                    if (leg.StartValue == 501)
-                        dartCountPerLegs501.Add(dc);
-                    if (leg.StartValue == 301)
-                        dartCountPerLegs301.Add(dc);
-
-					checkouts.Add(allThrowsByPlayer[allThrowsByPlayer.Count - 1].Throw);
-                    highscores.Add(GetHighestThrow(allThrowsByPlayer));
-                    avgs.Add(legAvg);
+                    
+					switch (leg.StartValue)
+					{
+						case 170:
+                            allThrowsByPlayer170 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                            legAvg170 = allThrowsByPlayer170.Sum(x => x.Throw) / (allThrowsByPlayer170.Count - 1);
+                            dc170 = allThrowsByPlayer170.Count() * 3;
+                            dartCountPerLegs170.Add(dc170);
+                            avgs170.Add(legAvg170);
+                            checkouts170.Add(allThrowsByPlayer170[allThrowsByPlayer170.Count - 1].Throw);
+                            highscores170.Add(GetHighestThrow(allThrowsByPlayer170));
+                            break;
+                        case 301:
+                            allThrowsByPlayer301 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                            legAvg301 = allThrowsByPlayer301.Sum(x => x.Throw) / (allThrowsByPlayer301.Count - 1);
+                            dc301 = allThrowsByPlayer301.Count() * 3;
+                            dartCountPerLegs301.Add(dc301);
+                            avgs301.Add(legAvg301);
+                            checkouts301.Add(allThrowsByPlayer301[allThrowsByPlayer301.Count - 1].Throw);
+                            highscores301.Add(GetHighestThrow(allThrowsByPlayer301));
+                            break;
+                        case 501:
+                            allThrowsByPlayer501 = await AllThrows.GetThrowsByLegIdAndPlayerId(leg.Id, player.Id);
+                            legAvg501 = allThrowsByPlayer501.Sum(x => x.Throw) / (allThrowsByPlayer501.Count - 1);
+                            dc501 = allThrowsByPlayer501.Count() * 3;
+                            dartCountPerLegs501.Add(dc501);
+                            avgs501.Add(legAvg501);
+                            checkouts501.Add(allThrowsByPlayer501[allThrowsByPlayer501.Count - 1].Throw);
+                            highscores501.Add(GetHighestThrow(allThrowsByPlayer501));
+                            break;
+                    }
                 }
 
 				var matches = await AllMatchPlayers.GetMatchesByPlayer(player.Id);
 
-                model.AllLegAvg = avgs.Sum() / avgs.Count;
-				model.BestLegAvg = avgs.Max();
-				if(dartCountPerLegs501.Count>0)
-					model.BestDartCount501 = dartCountPerLegs501.Min();
+                if (avgs170.Count > 0)
+				{
+                    model.AllLegAvg170 = avgs170.Sum() / avgs170.Count;
+                    model.BestLegAvg170 = avgs170.Max();
+                }
+				if (avgs301.Count > 0)
+				{
+					model.AllLegAvg301 = avgs301.Sum() / avgs301.Count;
+					model.BestLegAvg301 = avgs301.Max();
+				}
+                if (avgs501.Count>0)
+				{
+                    model.AllLegAvg501 = avgs501.Sum() / avgs501.Count;
+                    model.BestLegAvg501 = avgs501.Max();
+                }
+
                 if (dartCountPerLegs170.Count > 0)
                     model.BestDartCount170 = dartCountPerLegs170.Min();
                 if (dartCountPerLegs301.Count > 0)
                     model.BestDartCount301 = dartCountPerLegs301.Min();
-				model.HighScore = highscores.Max();
-				model.HighestCheckout = checkouts.Max();
-				model.LegCount = legs.Count();
+                if (dartCountPerLegs501.Count>0)
+					model.BestDartCount501 = dartCountPerLegs501.Min();
 
-				model.MatchCount = matches.Count();
+                model.HighScore170 = highscores170.Max();
+                model.HighScore301 = highscores301.Max();
+                model.HighScore501 = highscores501.Max();
+                model.HighestCheckout170 = checkouts170.Max();
+                model.HighestCheckout301 = checkouts301.Max();
+                model.HighestCheckout501 = checkouts501.Max();
+
+                model.LegCount170 = legs.Where(x => x.StartValue == 170).Count();
+                model.LegCount301 = legs.Where(x => x.StartValue == 301).Count();
+                model.LegCount501 = legs.Where(x => x.StartValue == 501).Count();
+                model.MatchCount = matches.Count();
+
             }
 
             return model;

@@ -46,6 +46,18 @@ h3 {
     padding: 15px;
 }
 
+.serv ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 200px;
+}
+
+    .serv ul li {
+        list-style: none;
+        padding: 55px;
+        flex: 0 0 33.333333%;
+    }
+
 /*
 
 @media (prefers-reduced-motion: no-preference) {

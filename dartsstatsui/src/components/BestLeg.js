@@ -8,9 +8,9 @@ Chart.register(LinearScale);
 Chart.register(PointElement);
 Chart.register(LineElement);
 
-function TotalDartsChart(props) {
+function BestLegChart(props) {
 
-    const [checkoutData, setCheckoutData] = useState({
+    const [bestLegData, setBestLegData] = useState({
         labels: [],
         datasets: []
     });
@@ -18,12 +18,12 @@ function TotalDartsChart(props) {
     useEffect(() => {
         async function fetchData() {
             let mounted = true;
-            let url = 'https://localhost:7141/players/' + props.playerId + '/legs/darts';
+            let url = 'https://localhost:7141/players/' + props.playerId + '/legs/' + props.startValue + '/bestleg';
             await fetch(url)
                 .then(response => response.json())
                 .then(response => {
                     if (mounted) {
-                        setCheckoutData(response)
+                        setBestLegData(response)
                     }
                 })
                 .catch(error => console.log('error: ' + error))
@@ -35,10 +35,10 @@ function TotalDartsChart(props) {
     return (
         <div className='mychart'>
             <h3>
-                Darts pro Leg
+                Bestes Leg ({props.startValue})
             </h3>
             <Line
-                data={checkoutData}
+                data={bestLegData}
                 width={300}
                 height={200}
                 options={{}}
@@ -47,4 +47,4 @@ function TotalDartsChart(props) {
     )
 }
 
-export default TotalDartsChart;
+export default BestLegChart;

@@ -8,7 +8,7 @@ Chart.register(LinearScale);
 Chart.register(PointElement);
 Chart.register(LineElement);
 
-function TotalDartsChart(props) {
+function LastWeeksTrend(props) {
 
     const [checkoutData, setCheckoutData] = useState({
         labels: [],
@@ -18,7 +18,7 @@ function TotalDartsChart(props) {
     useEffect(() => {
         async function fetchData() {
             let mounted = true;
-            let url = 'https://localhost:7141/players/' + props.playerId + '/legs/darts';
+            let url = 'https://localhost:7141/players/' + props.playerId + '/legs/' + props.startValue + '/lastweekstrend';
             await fetch(url)
                 .then(response => response.json())
                 .then(response => {
@@ -35,7 +35,7 @@ function TotalDartsChart(props) {
     return (
         <div className='mychart'>
             <h3>
-                Darts pro Leg
+                Letzte Woche ({props.startValue})
             </h3>
             <Line
                 data={checkoutData}
@@ -47,4 +47,4 @@ function TotalDartsChart(props) {
     )
 }
 
-export default TotalDartsChart;
+export default LastWeeksTrend;
