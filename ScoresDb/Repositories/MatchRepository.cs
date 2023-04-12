@@ -382,28 +382,110 @@ namespace ScoresDb.Repositories
             return ret;
         }
 
-        public async Task<List<LegEntity>> GetAllMatchesByDateAndPlayerId(Guid playerId, DateTime startDate, int startValue)
-		{
-			var ret = new List<LegEntity>();
-            var legs = await AllLegs.GetAllWonLegs(playerId);
+        public async Task<List<LegEntity>> GetLastTenMatchesByPlayerId(Guid playerId, int startValue)
+        {
+            var ret = new List<LegEntity>();
+			var found = 0;
 
             Items = new List<MatchEntity>();
             await ReadAll();
 
-			var lastWeeksMatches = Items.Where(m => m.PlayedAt >= startDate);
+			var lastTenMatches = Items.OrderByDescending(x => x.PlayedAt);
+            foreach (var match in lastTenMatches)
+            {
+                foreach (var set in match.Sets)
+                {
+					foreach (var leg in set.Legs)
+                    {
+						if(leg.StartValue == startValue)
+						{
+                            foreach (var thr in leg.ThrowsOfPlayers)
+                            {
+                                if (thr.PlayerId == playerId)
+                                {
+									found++;
+                                    ret.Add(leg);
+                                    break;
+                                }
+                            }
+                        }
+						if (found >= 10)
+							return ret;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public async Task<List<LegEntity>> GetAllMatchesByDateAndPlayerId(Guid playerId, DateTime startDate, int startValue)
+		{
+			var ret = new List<LegEntity>();
+            var legs = await AllLegs.GetAllWonLegs(playerId);
+			var found = false;
+
+            Items = new List<MatchEntity>();
+            await ReadAll();
+
+			var lastWeeksMatches = Items.Where(m => m.PlayedAt >= startDate).ToList();
 			foreach (var match in lastWeeksMatches)
 			{
 				foreach(var set in match.Sets)
 				{
+					found = false;
 					foreach(var leg in set.Legs)
 					{
-						if(leg.LegWinner.Equals(playerId) && leg.StartValue == startValue)
-							ret.Add(leg);
-					}
-				}
+						if (leg.StartValue == startValue)
+						{
+                            foreach (var thr in leg.ThrowsOfPlayers)
+                            {
+                                if (thr.PlayerId == playerId)
+                                {
+                                    ret.Add(leg);
+                                    found = true;
+                                    break;
+                                }
+                            }
+		                }
+	                    if (found)
+                          break;
+                    }
+                }
 			}
 			return ret;
 
+        }
+
+
+        public async Task<PlayerDartsPerLegModel> CountHighestThrows(Guid playerId, int startValue)
+        {
+            var ret = new PlayerDartsPerLegModel();
+            var player = await AllPlayers.GetById(playerId);
+            var lastTenMatches = await GetLastTenMatchesByPlayerId(playerId, startValue);
+            var lbls = new List<string>();
+            var overEigthy = new List<int>();
+            var legAvg = 0;
+            var index = 0;
+
+            if (player != null)
+            {
+
+                ret.PlayerId = player.Id.ToString();
+                ret.PlayerName = player.Name;
+
+				for (int i = 0; i < lastTenMatches.Count(); i++)
+				{
+			        lbls.Add(index.ToString());
+                    var allThrowsByPlayer = await AllThrows.GetThrowsByLegIdAndPlayerId(lastTenMatches[i].Id, player.Id);
+                	overEigthy.Add(CountHighestThrows(allThrowsByPlayer, 80));
+                    index++;
+                }
+
+                ret.Datasets.Add(new LineChartDataSetModel { id = 1, label = ">= 80", data = overEigthy.ToArray(), borderColor = "rgb(255, 140, 25)", backgroundColor = "rgba(255, 140, 25, 0.75)" });
+
+            }
+
+            ret.labels = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
+            return ret;
         }
 
         public async Task<PlayerDartsPerLegModel> GetOneWeekTrend(Guid playerId, int startValue)
@@ -616,7 +698,17 @@ namespace ScoresDb.Repositories
             return model;
         }
 
-       
+        public int CountHighestThrows(AllThrowsEntity allThrowsByPlayer, int minimum)
+        {
+            var count = 0;
+
+            foreach (var thr in allThrowsByPlayer)
+            {
+                if (thr.Throw >= minimum)
+                    count++;
+            }
+            return count;
+        }
 
         public int GetHighestThrow(AllThrowsEntity allThrowsByPlayer)
 		{

@@ -23,6 +23,8 @@ namespace ScoresDb.Repositories
 
         Task<PlayerDartsPerLegModel> GetOneWeekTrend(Guid playerId, int startValue);
 
+        Task<PlayerDartsPerLegModel> CountHighestThrows(Guid playerId, int startValue);
+
     }
 
 }

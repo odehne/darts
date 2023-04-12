@@ -9,7 +9,7 @@ import '../App.css';
 import PlayerStats from '../components/PlayerStats';
 import BestLeg from '../components/BestLeg';
 import LastWeeksTrend from '../components/LastWeeksTrend';
-
+import HighestThrows from '../components/HighestThrows';
 
 function Player() {
     let { playerId } = useParams();
@@ -23,6 +23,9 @@ function Player() {
                     <li><BestLeg playerId={playerId} startValue='170' /></li>
                     <li><BestLeg playerId={playerId} startValue='301' /></li>
                     <li><BestLeg playerId={playerId} startValue='501' /></li>
+                    <li><HighestThrows playerId={playerId} startValue='170' /></li>
+                    <li><HighestThrows playerId={playerId} startValue='301' /></li>
+                    <li><HighestThrows playerId={playerId} startValue='501' /></li>
                     <li><LastWeeksTrend playerId={playerId} startValue='170' /></li>
                     <li><LastWeeksTrend playerId={playerId} startValue='301' /></li>
                     <li><LastWeeksTrend playerId={playerId} startValue='501' /></li>

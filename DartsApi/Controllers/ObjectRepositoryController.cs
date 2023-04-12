@@ -124,6 +124,15 @@ namespace DartsApi.Controllers
         }
 
         [HttpGet]
+        [Route("/players/{playerId}/legs/{startvalue}/counthighthrows")]
+        [ProducesResponseType(typeof(PlayerDartsPerLegModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PlayerDartsPerLegModel>> GetHighThrows(string playerId, int startvalue)
+        {
+            var ret = await _gameRepo.CountHighestThrows(Guid.Parse(playerId), startvalue);
+            return Ok(ret);
+        }
+
+        [HttpGet]
 		[Route("/players/{playerId}/legs/darts")]
 		[ProducesResponseType(typeof(PlayerDartsPerLegModel), StatusCodes.Status200OK)]
 		public async Task<ActionResult<PlayerDartsPerLegModel>> GetHowManyDartsPerLeg(string playerId)
